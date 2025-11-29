@@ -1,35 +1,42 @@
-import pandas as pd
 from django.db import models
 
 # Create your models here.
 
-# Existing Database
-df = pd.read_csv("datasets/Political Dynasty v9.csv")
-
 class Politician(models.Model):
-    # Not sure whether we should activate blank and null for all fields
-    last_name = models.CharField(max_length = 100, blank = True, null = True)
-    first_name = models.CharField(max_length = 100, blank = True, null = True)
+    last_name = models.CharField(max_length = 100)
+    first_name = models.CharField(max_length = 100)
     middle_name = models.CharField(max_length = 100, blank = True, null = True)
 
     def __str__(self):
-        return f"Politician {self.id}: {self.first_name} {self.middle_name} {self.last_name}"
-    
+        return f"{self.first_name} {self.middle_name or ''} {self.last_name}".strip()
+
+class Region(models.Model):
+    name = models.CharField(max_length = 100, unique = True)
+
+class Province(models.Model):
+    name = models.CharField(max_length = 100, unique = True)
+    region = models.ForeignKey(Region, on_delete = models.CASCADE)
+
 class PoliticianRecord(models.Model):
     politician = models.ForeignKey(Politician, on_delete = models.CASCADE)
+    region = models.ForeignKey(Region, on_delete = models.PROTECT)
+    province = models.ForeignKey(Province, on_delete = models.PROTECT)
 
-    position_choices = {(pos, pos) for pos in df['Position'].unique()}
+    position_choices = [
+    ("COUNCILOR", "COUNCILOR"),
+    ("PROVINCIAL BOARD MEMBER", "PROVINCIAL BOARD MEMBER"),
+    ("VICE MAYOR", "VICE MAYOR"),
+    ("VICE GOVERNOR", "VICE GOVERNOR"),
+    ("MAYOR", "MAYOR"),
+    ("MEMBER, HOUSE OF REPRESENTATIVES", "MEMBER, HOUSE OF REPRESENTATIVES"),
+    ("GOVERNOR", "GOVERNOR"),
+    ]
     position = models.CharField(max_length = 100, choices = position_choices)
 
     party = models.CharField(max_length = 100, blank = True, null = True)
 
-    year_choices = {(year, year) for year in df['Year'].unique()}
+    year_choices = {(year, year) for year in range(2002, 2026, 4)}
     year = models.IntegerField(choices = year_choices)
-
-    region_choices = {(reg, reg) for reg in df['Region'].unique()}
-    region = models.CharField(max_length = 100, choices = region_choices)
-    province_choices = {(prov, prov) for prov in df[df['Region'] == region]['Province'].unique()}
-    province = models.CharField(max_length = 100, choices = province_choices)
     
     position_weight_dict = {
         'COUNCILOR' : 2,
@@ -40,7 +47,9 @@ class PoliticianRecord(models.Model):
         'MEMBER, HOUSE OF REPRESENTATIVES' : 5,
         'GOVERNOR' : 5
     }
-    position_weight = models.IntegerField(choices = position_weight_dict)
+    
+    def position_weight(self):
+        return self.position_weight_dict.get(self.position, 0)
 
     def __str__(self):
         return f"Politician {self.politician.first_name} {self.politician.middle_name} {self.politician.last_name}: {self.position} of {self.province}, {self.region} in {self.year}..."
