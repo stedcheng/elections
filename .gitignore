@@ -1,0 +1,12 @@
+# Ignore python cache
+politicians/__pycache__/
+*.pyc
+
+politicians/migrations/__pycache__/
+*.pyc
+
+# Ignore scratch files
+populate_region_province.py
+temp.ipynb
+datasets/PH_Adm2_ProvDists.csv
+datasets/region_province.csv
