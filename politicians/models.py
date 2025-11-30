@@ -26,7 +26,7 @@ class Province(models.Model):
 
 class PoliticianRecord(models.Model):
     politician = models.ForeignKey(Politician, on_delete = models.CASCADE)
-    region = models.ForeignKey(Region, on_delete = models.PROTECT)
+    region = models.ForeignKey(Region, on_delete = models.PROTECT, null = True, blank = True)
     province = models.ForeignKey(Province, on_delete = models.PROTECT)
 
     position_choices = [
