@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Province Analysis - Dynasties in Philippine Politics{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1>Closer Look per Province</h1>
+    <p class="text-muted">Analyze dynasty structures and family name distributions in {{ selected_province }} ({{ selected_year }})</p>
+    
+    <!-- Family Name Distribution and Dynasty Sizes -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h5>How are family names (last names and middle names) distributed in the largest dynasty in {{ selected_province }} ({{ selected_year }})?</h5>
+            {% if family_warning %}
+                <div class="alert alert-warning">{{ family_warning }}</div>
+            {% else %}
+                <div id="family-chart"></div>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-6">
+            <h5>What are the sizes of the dynasties in {{ selected_province }} ({{ selected_year }})? Which family name appears the most in these dynasties?</h5>
+            {% if dynasty_warning %}
+                <div class="alert alert-warning">{{ dynasty_warning }}</div>
+            {% else %}
+                <div id="dynasty-chart"></div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Concentration Analysis -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h5>How is family name concentration in {{ selected_province }} ({{ selected_year }}) related to their average position weight? Where do the largest dynasties land on this scale?</h5>
+            {% if concentration_warning %}
+                <div class="alert alert-warning">{{ concentration_warning }}</div>
+            {% else %}
+                <div id="concentration-chart"></div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    {% if family_chart %}
+    var familyChart = JSON.parse('{{ family_chart|escapejs }}');
+    Plotly.newPlot('family-chart', familyChart.data, familyChart.layout);
+    {% endif %}
+    
+    {% if dynasty_chart %}
+    var dynastyChart = JSON.parse('{{ dynasty_chart|escapejs }}');
+    Plotly.newPlot('dynasty-chart', dynastyChart.data, dynastyChart.layout);
+    {% endif %}
+    
+    {% if concentration_chart %}
+    var concentrationChart = JSON.parse('{{ concentration_chart|escapejs }}');
+    Plotly.newPlot('concentration-chart', concentrationChart.data, concentrationChart.layout);
+    {% endif %}
+</script>
+{% endblock %}
