@@ -1,0 +1,93 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Sofia PRO', sans-serif;
+    background-color: #000; /* black background for body */
+    color: #fff;
+}
+
+p {
+    margin: 5px 0;
+}
+
+
+div.title {
+    width: 25%;
+    min-width: 250px;
+    height: 100vh;
+    background-color: #ffff99;
+    float: left;
+    position: fixed;
+    text-align: center;
+    overflow-y: auto;
+    padding-top: 20px;
+}
+
+div.title img#profile {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 20px;
+}
+
+div.title .main-name {
+    font-family: 'TW Cen MT', sans-serif;
+    font-size: 28px;
+    text-shadow: 1px 1px #ff8533;
+    margin-bottom: 10px;
+}
+
+div.title .party {
+    font-family: 'The Font', sans-serif;
+    font-size: 22px;
+    background-color: #ff8533;
+    color: black;
+    padding: 5px 10px;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+div.body {
+    margin-left: 25%;
+    padding: 20px;
+    min-height: 100vh;
+    background-color: black;
+    overflow-x: hidden;
+}
+
+.section-title {
+    font-family: 'Retrology DEMO', sans-serif;
+    font-size: 36px;
+    color: #ffff99;
+    text-shadow: 3px 3px #000;
+    margin-top: 40px;
+    margin-bottom: 10px;
+}
+
+ul.section-list {
+    list-style-type: none;
+    padding-left: 0;
+    font-size: 22px;
+    color: #ff8533;
+    letter-spacing: 1px;
+}
+
+ul.section-list li {
+    text-indent: 0;
+    padding-left: 20px;
+    margin-bottom: 8px;
+    color: #fff;
+}
+
+@media screen and (max-width: 900px) {
+    div.title {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+
+    div.body {
+        margin-left: 0;
+    }
+}
