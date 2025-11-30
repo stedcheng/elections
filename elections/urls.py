@@ -15,11 +15,8 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-<<<<<<< HEAD
 from django.urls import path, include
-=======
 from django.urls import include, path
->>>>>>> c73e293597bb9160cee965852233bdb0586d6bae
 from django.http import HttpResponse
 # from django.conf.urls import handler404
 # from django.views.defaults import page_not_found
@@ -30,10 +27,6 @@ def helloworld(request):
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', helloworld),
-<<<<<<< HEAD
-    path('province/', include('province.urls'))
-]
-=======
+    path('province/', include('province.urls')),
     path('politicians/', include('politicians.urls'))
 ]
->>>>>>> c73e293597bb9160cee965852233bdb0586d6bae
