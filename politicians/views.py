@@ -3,6 +3,7 @@ from .models import Politician, PoliticianRecord
 from .forms import PoliticianForm, PoliticianRecordForm
 from django.http import HttpResponse
 from django.contrib import messages
+import numpy as np
 
 # Create your views here.
 
@@ -17,11 +18,11 @@ def get_name(politician):
 
 # View a specific politician's details and records.
 def politician_view(request, politician_name):
-    # URLs are expected to be in "first-middle-last" or "first-last" format.
+    # URLs are expected to be in "first_names-middle_names-last_names" or "first_names-last_names" format.
     name_parts = politician_name.split("-")
-    first_name = name_parts[0]
-    middle_name = name_parts[1] if len(name_parts) == 3 else ''
-    last_name = name_parts[-1]
+    first_name = " ".join(name_parts[0].split("_")).upper()
+    middle_name = " ".join(name_parts[1].split("_")).upper() if len(name_parts) == 3 else np.nan
+    last_name = " ".join(name_parts[-1].split("_")).upper()
     # Extract the politician and their records.
     p = get_object_or_404(Politician, first_name = first_name, last_name = last_name, middle_name = middle_name)
     pr = PoliticianRecord.objects.filter(politician = p)
@@ -52,20 +53,39 @@ def politician_add(request):
             region = rf.cleaned_data['region']
             province = rf.cleaned_data['province']
             if province not in region.province_set.all():
-                messages.success(request, "Invalid region-province pair")
+                messages.success(request, "Invalid region-province pair. Please try again.")
             else:
                 record = rf.save(commit = False)
                 record.politician = politician
                 record.save()
             
-                return redirect("politicians:politician_view", politician_name = get_name(politician))
+                return redirect('politicians:politician_view', politician_name = get_name(politician))
     context = {
         'politician_form' : pf,
         'record_form' : rf
         }
     return render(request, 'politicians/politician_add.html', context)
 
-def politician_update(request, record_id):
+def politician_update(request, politician_name):
+    name_parts = politician_name.split("-")
+    first_name = " ".join(name_parts[0].split("_")).upper()
+    middle_name = " ".join(name_parts[1].split("_")).upper() if len(name_parts) == 3 else np.nan
+    last_name = " ".join(name_parts[-1].split("_")).upper()
+    politician = get_object_or_404(Politician, first_name = first_name, last_name = last_name, middle_name = middle_name)
+    if request.method == "GET":
+        pf = PoliticianForm(instance = politician)
+    elif request.method == "POST":
+        pf = PoliticianForm(request.POST, instance = politician)
+        if pf.is_valid():
+            pf.save()
+            return redirect("politicians:politician_view", politician_name = get_name(p))
+    context = {
+        'politician_form' : pf,
+        'politician' : politician
+        }
+    return render(request, 'politicians/politician_update.html', context)
+
+def politicianrecord_update(request, record_id):
     record = get_object_or_404(PoliticianRecord, id = record_id)
     politician = record.politician
     if request.method == "GET":
@@ -81,10 +101,28 @@ def politician_update(request, record_id):
             r.politician = politician
             r.save()
 
-            return redirect("politician_view", politician_name = get_name(politician))
+            return redirect('politicians:politician_view', politician_name = get_name(politician))
     context = {
         'politician_form' : pf,
         'record_form' : rf,
         'record' : record
         }
     return render(request, 'politicians/politician_update.html', context)
+
+def politicianrecord_delete(request, record_id):
+    record = get_object_or_404(PoliticianRecord, id = record_id)
+    politician = record.politician
+    if request.method == "GET":
+        context = {
+            'politician' : politician
+            }
+        return render(request, "politicians/politician_delete.html", context)
+    elif request.method == "POST":
+        if PoliticianRecord.objects.filter(politician = politician).count() == 1:
+            # Note that both the record and the politician are deleted due to on_delete = models.CASCADE.
+            # record.delete()
+            politician.delete()
+        else:
+            record.delete()
+        # Index page for now, can be overview page later
+        return redirect("politicians/")

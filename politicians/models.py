@@ -1,5 +1,5 @@
 from django.db import models
-import pandas as pd
+import numpy as np
 
 # Create your models here.
 
@@ -8,8 +8,25 @@ class Politician(models.Model):
     first_name = models.CharField(max_length = 100)
     middle_name = models.CharField(max_length = 100, blank = True, null = True)
 
+    # Uppercase for consistency
+    def save(self, *args, **kwargs):
+        if self.first_name:
+            self.first_name = self.first_name.upper()
+        if self.middle_name:
+            self.middle_name = self.middle_name.upper()
+        if self.last_name:
+            self.last_name = self.last_name.upper()
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return f"{self.first_name} {self.middle_name or ''} {self.last_name}".strip()
+        name_parts = []
+        name_parts.append(self.first_name)
+        # Assumption: Empty cells upon populating the database got stored as "nan" strings due to models.CharField().
+        # Temporary fix: Check for the "nan" string, since we assume that entries are in uppercase.
+        if self.middle_name != "nan":
+            name_parts.append(self.middle_name)
+        name_parts.append(self.last_name)
+        return " ".join(name_parts)
 
 class Region(models.Model):
     name = models.CharField(max_length = 100, unique = True)
@@ -59,4 +76,4 @@ class PoliticianRecord(models.Model):
         return self.position_weight_dict.get(self.position, 0)
 
     def __str__(self):
-        return f"Politician {self.politician.first_name} {self.politician.middle_name} {self.politician.last_name}: {self.position} of {self.province}, {self.region} in {self.year}..."
+        return f"Politician {self.politician}: {self.position} of {self.province}, {self.region} in {self.year}..."
