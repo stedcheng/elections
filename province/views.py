@@ -7,7 +7,7 @@ from plotly.utils import PlotlyJSONEncoder
 import os
 from django.conf import settings
 from django.shortcuts import render
-from .models import Province, Politician, Region, PoliticianRecord
+from politicians.models import Province, Politician, PoliticianRecord
 import json
 
 # Get the base context using the models we had
