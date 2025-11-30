@@ -2,6 +2,9 @@
 __pycache__/
 *.pyc
 
+elections/__pycache__/
+*.pyc
+
 # Ignore scratch files
 populate_region_province.py
 temp.ipynb
