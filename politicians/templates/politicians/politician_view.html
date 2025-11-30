@@ -1,0 +1,15 @@
+{% extends 'politicians/base_template.html' %}
+{% block pagetitle %}View Politician Records{% endblock %}
+{% block maincontent %}
+<h2>Records of {{ politician }}</h2>
+{% if politician_records %}
+    <ul>
+        {% for politician_record in politician_records %}
+            <li> {{ politician_record }} </li>
+        {% endfor %}
+    </ul>
+{% else %}
+<p>No records found.</p>
+{% endif %}
+
+{% endblock %}
