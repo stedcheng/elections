@@ -1,27 +1,27 @@
 from politicians.models import *
 import pandas as pd
 
-df_region_province = pd.read_csv("datasets/region_province.csv")
+# df_region_province = pd.read_csv("datasets/region_province.csv")
 
-regions = df_region_province["Region"].unique()
-for region in regions:
-    region_object, _ = Region.objects.get_or_create(name = region)
+# regions = df_region_province["Region"].unique()
+# for region in regions:
+#     region_object, _ = Region.objects.get_or_create(name = region)
 
-print(Region.objects.count())
-print(Region.objects.all())
+# print(Region.objects.count())
+# print(Region.objects.all())
 
-for i in range(df_region_province.shape[0]):
-    row = df_region_province.iloc[i]
-    region, province = row["Region"], row["Province"]
-    region_object, _ = Region.objects.get_or_create(name = region)
-    province_object, _ = Province.objects.get_or_create(name = province, region = region_object)
+# for i in range(df_region_province.shape[0]):
+#     row = df_region_province.iloc[i]
+#     region, province = row["Region"], row["Province"]
+#     region_object, _ = Region.objects.get_or_create(name = region)
+#     province_object, _ = Province.objects.get_or_create(name = province, region = region_object)
 
-print(Province.objects.count())
-print(Province.objects.all())
+# print(Province.objects.count())
+# print(Province.objects.all())
 
-for region in Region.objects.all():
-    for province in region.province_set.all():
-        print(region.name, "->", province.name)
+# for region in Region.objects.all():
+#     for province in region.province_set.all():
+#         print(region.name, "->", province.name)
 
 ############################## 
 
