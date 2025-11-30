@@ -2,8 +2,6 @@ from django.forms import ModelForm, HiddenInput, ChoiceField
 from .models import Politician, Region, Province, PoliticianRecord
 import pandas as pd
 
-df = pd.read_csv("datasets/region_province.csv")
-
 class PoliticianForm(ModelForm):
     class Meta:
         model = Politician

@@ -7,7 +7,7 @@ app_name = 'politicians'
 urlpatterns = [
     path('', views.index),
     path('politician/add/', views.politician_add),
-    path('politician/<politician_name>', views.politician_view, name = "politician_view"),
+    path('politician/<politician_name>/', views.politician_view, name = "politician_view"),
     # path('customers/', views.listcustomers, name = 'customer-list'),
     # path('customer/new/', views.addcustomer, name = 'customer-add'),
     # path('customer/<int:pk>/', views.detailcustomer, name = 'customer-detail'),
