@@ -1,8 +1,5 @@
 # Ignore python cache
-politicians/__pycache__/
-*.pyc
-
-politicians/migrations/__pycache__/
+__pycache__/
 *.pyc
 
 # Ignore scratch files
