@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+        <meta charset="utf-8">
+        <title>Elections - {% block pagetitle %}{% endblock %}</title>
+    </head>
+    <body>
+
+        <header>        
+            <h1>Politician Information</h1>
+        </header>
+
+        {% comment %}
+        <nav>
+            <ul>
+                <li><a href="{% url 'webkiosk:customer-list' %}">Customers</a></li>
+                <li><a href="{% url 'webkiosk:customer-add' %}">Add Customer</a></li>
+            </ul>
+        </nav>
+        {% endcomment %}
+
+        <main>
+            {% block maincontent %}{% endblock %}
+        </main>
+
+    </body>
+
+</html>

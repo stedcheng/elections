@@ -1,5 +1,8 @@
-from django.forms import ModelForm, HiddenInput
+from django.forms import ModelForm, HiddenInput, ChoiceField
 from .models import Politician, Region, Province, PoliticianRecord
+import pandas as pd
+
+df = pd.read_csv("datasets/region_province.csv")
 
 class PoliticianForm(ModelForm):
     class Meta:
@@ -11,21 +14,21 @@ class PoliticianRecordForm(ModelForm):
         model = PoliticianRecord
         fields = ['position', 'party', 'year', 'region', 'province']
         
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-            
-            # Temporarily disables the province field if the region field is empty
-            self.fields['province'].queryset = Province.objects.none()
-            self.fields['province'].disabled = True
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+        
+    #     # Temporarily disables the province field if the region field is empty
+    #     self.fields['province'].queryset = Province.objects.none()
+    #     self.fields['province'].disabled = True
 
-            if 'region' in self.data:
-                try:
-                    region_id = int(self.data.get('region'))
-                    self.fields['province'].queryset = Province.objects.filter(region_id = region_id)
-                    self.fields['province'].disabled = False
-                except:
-                    pass
+    #     if 'region' in self.data:
+    #         try:
+    #             region_id = int(self.data.get('region'))
+    #             self.fields['province'].queryset = Province.objects.filter(region_id = region_id)
+    #             self.fields['province'].disabled = False
+    #         except:
+    #             pass
 
-            elif self.instance.pk:
-                self.fields['province'].queryset = Province.objects.filter(region = self.instance.region)
-                self.fields['province'].disabled = False
+    #     elif self.instance.pk:
+    #         self.fields['province'].queryset = Province.objects.filter(region = self.instance.region)
+    #         self.fields['province'].disabled = False

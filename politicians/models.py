@@ -1,4 +1,5 @@
 from django.db import models
+import pandas as pd
 
 # Create your models here.
 
@@ -13,9 +14,15 @@ class Politician(models.Model):
 class Region(models.Model):
     name = models.CharField(max_length = 100, unique = True)
 
+    def __str__(self):
+        return self.name
+
 class Province(models.Model):
     name = models.CharField(max_length = 100, unique = True)
     region = models.ForeignKey(Region, on_delete = models.CASCADE)
+
+    def __str__(self):
+        return self.name
 
 class PoliticianRecord(models.Model):
     politician = models.ForeignKey(Politician, on_delete = models.CASCADE)
@@ -35,7 +42,7 @@ class PoliticianRecord(models.Model):
 
     party = models.CharField(max_length = 100, blank = True, null = True)
 
-    year_choices = {(year, year) for year in range(2002, 2026, 4)}
+    year_choices = {(year, year) for year in range(2004, 2023, 3)}
     year = models.IntegerField(choices = year_choices)
     
     position_weight_dict = {

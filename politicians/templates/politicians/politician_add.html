@@ -1,0 +1,19 @@
+{% extends 'politicians/base_template.html' %}
+{% block pagetitle %}Politician Form{% endblock %}
+{% block maincontent %}
+<h2>Add Politician Record</h2>
+<form method="post">
+    {% csrf_token %}
+    <p>Politician</p>
+    {{ politician_form.as_ul }}
+    <p>-----</p>
+    <p>Politician Record</p>
+    {{ record_form.as_ul }}
+    <input type="submit" value="Submit">
+</form>
+<ul>
+    {% for message in messages %}
+        <li>{{message}}</li>
+    {% endfor %}
+</ul> 
+{% endblock %}
