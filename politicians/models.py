@@ -61,6 +61,8 @@ class PoliticianRecord(models.Model):
 
     year_choices = {(year, year) for year in range(2004, 2023, 3)}
     year = models.IntegerField(choices = year_choices)
+
+    community = models.IntegerField()
     
     position_weight_dict = {
         'COUNCILOR' : 2,
