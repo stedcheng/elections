@@ -2,14 +2,24 @@
 {% block pagetitle %}View Politician Records{% endblock %}
 {% block maincontent %}
 <h2>Records of {{ politician }}</h2>
-{% if politician_records %}
+<a href="{% url 'politicians:politician_update' politician.slug %}">Update Politician</a>
+<a href="{% url 'politicians:politicianrecord_add' politician.slug %}">Add Record</a>
+{% if records %}
     <ul>
-        {% for politician_record in politician_records %}
-            <li> {{ politician_record }} </li>
+        {% for record in records %}
+            <li> 
+                {{ record }} 
+                <a href="{% url 'politicians:politicianrecord_update' record.politician.slug record.id %}">Update Record</a>
+                <a href="{% url 'politicians:politicianrecord_delete' record.politician.slug record.id %}">Delete Record</a>
+            </li>
         {% endfor %}
     </ul>
 {% else %}
 <p>No records found.</p>
 {% endif %}
-
+<ul>
+    {% for message in messages %}
+        <li>{{message}}</li>
+    {% endfor %}
+</ul> 
 {% endblock %}
