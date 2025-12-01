@@ -62,11 +62,10 @@ def family_names(politician: Politician):
 
     return family_names
 
-# Generate a template of the size chart
 def create_dynasty_size_chart(province_name, year):
     """
-    Create dynasty size chart using Django ORM.
-    Equivalent to the pandas version.
+    Create dynasty size chart using Django ORM,
+    excluding communities with size 1 or no valid family names.
     """
 
     # 1. Filter records by province + year
@@ -79,46 +78,45 @@ def create_dynasty_size_chart(province_name, year):
     if not records.exists():
         return None, f"No political records found for {province_name} ({year})."
 
-    # 2. Group into communities (dynasties)
-    # Expecting: record.community (int or string)
+    # 2. Group into communities
     communities = {}
     for rec in records:
-        cid = rec.community  # YOU MUST CONFIRM THIS FIELD EXISTS
+        cid = rec.community
         if cid not in communities:
             communities[cid] = []
         communities[cid].append(rec)
 
-    # COMMUNITY SIZE DICT → {community_id: size}
     community_size = {cid: len(members) for cid, members in communities.items()}
 
-    # If all sizes are 1 → no dynasty
-    if not community_size or (
-        min(community_size.values()) == 1 and max(community_size.values()) == 1
-    ):
-        return None, f"There were no dynasties in {province_name} ({year})."
-
-    # 3. FAMILY NAMES per politician (using ORM-based family_names function)
-    name_mentions = []  # rows: {"community": X, "family_name": Y}
-
+    # 3. FAMILY NAMES per politician
+    name_mentions = []
     for cid, members in communities.items():
         for rec in members:
             fnames = family_names(rec.politician)
             for fam, source in fnames:
+                # ignore invalid family names
+                if fam is None or str(fam).strip().lower() == "nan":
+                    continue
                 name_mentions.append({
                     "community": cid,
                     "family_name": fam,
                     "source": source,
                 })
 
-    # 4. COUNT name mentions PER community
-    # dict: {(community, family_name): count}
+    # 4. COUNT name mentions per community
     counts = {}
     for row in name_mentions:
         key = (row["community"], row["family_name"])
         counts[key] = counts.get(key, 0) + 1
 
+    # 4a. Only include family names with total count >= 3
+    family_totals = {}
+    for (cid, fam), count in counts.items():
+        family_totals[(cid, fam)] = family_totals.get((cid, fam), 0) + count
+
+    counts = {k: v for k, v in counts.items() if family_totals[k] >= 3}
+
     # 5. Compute proportions and greatest contributor per community
-    # dict: {community: {"family_name": X, "proportion": p}}
     greatest = {}
     for (cid, fam), count in counts.items():
         size = community_size[cid]
@@ -130,15 +128,22 @@ def create_dynasty_size_chart(province_name, year):
                 "proportion": proportion
             }
 
-    # 6. FINAL LIST for chart
+    # 6. FINAL LIST for chart, only keep communities with size>1 and valid greatest
     display_list = []
     for cid, size in community_size.items():
-        g = greatest[cid]
+        if size <= 1:
+            continue  # skip single-member communities
+        g = greatest.get(cid)
+        if g is None:
+            continue  # skip if no valid family names
         display_list.append({
             "community": cid,
             "size": size,
             "greatest": f"{g['proportion']:.2%} | {g['family_name'].title()}"
         })
+
+    if not display_list:
+        return None, f"No valid dynasties to display in {province_name} ({year})."
 
     # Sort by community ID
     display_list = sorted(display_list, key=lambda x: x["community"])
@@ -167,11 +172,12 @@ def create_dynasty_size_chart(province_name, year):
 
     return json.dumps(fig, cls=PlotlyJSONEncoder), None
 
-# Generate distribution per family
-def create_family_name_distribution_chart(province_name, year):
-    """Create family name distribution chart for the largest dynasty using ORM"""
-
-    # 1. Fetch records for province + year
+def get_top_family_name(province_name, year):
+    """
+    Return the top 1 most frequent family name in the largest dynasty,
+    along with the list of politicians having that family name.
+    """
+    # 1. Fetch records
     records = (
         PoliticianRecord.objects
         .select_related("politician", "province")
@@ -179,93 +185,52 @@ def create_family_name_distribution_chart(province_name, year):
     )
 
     if not records.exists():
-        return None, f"No data available for {province_name} ({year})."
+        return None, f"No records found for {province_name} ({year})."
 
     # 2. Group by community
     communities = {}
     for rec in records:
-        cid = rec.community            # IMPORTANT: must exist
+        cid = rec.community
         communities.setdefault(cid, []).append(rec)
 
     if not communities:
         return None, f"No dynasties found for {province_name} ({year})."
 
-    # 3. Identify the LARGEST dynasty
+    # 3. Identify largest dynasty
     largest_community_id = max(communities, key=lambda cid: len(communities[cid]))
     largest_dynasty = communities[largest_community_id]
 
-    # 4. Extract family names for each member
-    name_mentions = []  # [{"family_name": X, "source": Y}]
-
+    # 4. Collect valid family names
+    family_list = []
+    family_to_politicians = {}  # map family -> list of politician names
+    print(largest_dynasty)
     for rec in largest_dynasty:
-        fnames = family_names(rec.politician)     # [["Garcia", "Last"], ...]
-        for fam, source in fnames:
-            name_mentions.append({
-                "family_name": fam,
-                "source": source
-            })
+        fnames = family_names(rec.politician)
+        for fam, _ in fnames:
+            if fam and str(fam).strip().lower() != "nan":
+                fam_clean = fam.strip()
+                family_list.append(fam_clean)
+                family_to_politicians.setdefault(fam_clean, []).append(rec.politician)
 
-    if not name_mentions:
+    if not family_list:
         return None, f"No family name data for largest dynasty in {province_name} ({year})."
 
-    # 5. Count mentions → {(family_name, source): count}
-    combo_counts = {}
-    for nm in name_mentions:
-        key = (nm["family_name"], nm["source"])
-        combo_counts[key] = combo_counts.get(key, 0) + 1
+    # 5. Count occurrences
+    df = pd.DataFrame({'Family': family_list})
+    top_family = df['Family'].value_counts().idxmax()
+    top_count = int(df['Family'].value_counts().max())
 
-    # 6. Total counts per family → {family_name: total_count}
-    family_totals = {}
-    for (fam, _), c in combo_counts.items():
-        family_totals[fam] = family_totals.get(fam, 0) + c
+    # 6. Get politicians with the top family name
+    top_family_politicians = family_to_politicians.get(top_family, [])
 
-    # 7. Group small families into "Others" IF >= 5 families
-    unique_families = list(family_totals.keys())
-    group_is_needed = len(unique_families) >= 5
+    dct = {
+        'Family': top_family,
+        'Count': top_count,
+        'Politicians': top_family_politicians
+    }
 
-    # Build table for the chart
-    rows = []  # [{"group": X, "source": Y, "count": Z}]
-
-    for (fam, source), count in combo_counts.items():
-        if group_is_needed and family_totals[fam] <= 1:
-            group = "Others"
-        else:
-            group = fam
-
-        rows.append({
-            "group": group,
-            "source": source,
-            "count": count
-        })
-
-    # 8. Aggregate again by (group, source)
-    final_counts = {}
-    for row in rows:
-        key = (row["group"], row["source"])
-        final_counts[key] = final_counts.get(key, 0) + row["count"]
-
-    final_rows = []
-    for (group, source), count in final_counts.items():
-        final_rows.append({
-            "Group": group,
-            "Source": source,
-            "Count": count,
-        })
-
-    # 9. Create Plotly chart (horizontal bar)
-    fig = px.bar(
-        final_rows,
-        x="Count",
-        y="Group",
-        color="Source",
-        orientation="h",
-        color_discrete_map={'Last': '#d54a46', 'Middle': '#fba050', 'Both': '#ee734a'},
-        title="Family Name Distribution of the Largest Dynasty"
-    )
-
-    fig.update_layout(height=400, yaxis={"categoryorder": "total ascending"})
-
-    return json.dumps(fig, cls=PlotlyJSONEncoder), None
+    print(dct)
+    return dct, None
 
 def province_analysis(request):
     # 1. Get common context data
@@ -276,7 +241,7 @@ def province_analysis(request):
 
     # 2. Create charts using ORM-based functions
     dynasty_chart, dynasty_warning = create_dynasty_size_chart(province, year)
-    family_chart, family_warning = create_family_name_distribution_chart(province, year)
+    top_family_dict, top_family_warning = get_top_family_name(province, year)
 
     # 3. Create concentration scatter plot
     concentration_chart = None
@@ -321,13 +286,15 @@ def province_analysis(request):
                 counts = {}
                 for nm in name_mentions:
                     counts[nm["family_name"]] = counts.get(nm["family_name"], 0) + 1
-                max_prop = max(counts.values()) / size
+                dominant_family = max(counts, key=counts.get)
+                max_prop = counts[dominant_family] / size
 
                 # 4. Average position weight
                 avg_position_weight = sum(rec.position_weight() for rec in members) / size
 
                 plot_data.append({
                     "Community": cid,
+                    "Family": dominant_family,
                     "Size": size,
                     "Proportion": max_prop,
                     "Average Position Weight": avg_position_weight
@@ -347,9 +314,10 @@ def province_analysis(request):
                         showscale=True,
                         opacity=0.75
                     ),
-                    customdata=[d["Community"] for d in plot_data],
+                    customdata=[[d['Community'], d['Family']] for d in plot_data],
                     hovertemplate=(
-                        'Community: %{customdata}<br>'
+                        'Community: %{customdata[0]}<br>'
+                        'Dominant Family: %{customdata[1]}<br>'
                         'Concentration: %{x:.2%}<br>'
                         'Avg Position Weight: %{y:.2f}<br>'
                         'Size: %{marker.color}<extra></extra>'
@@ -375,8 +343,8 @@ def province_analysis(request):
     context.update({
         'dynasty_chart': dynasty_chart,
         'dynasty_warning': dynasty_warning,
-        'family_chart': family_chart,
-        'family_warning': family_warning,
+        'top_family': top_family_dict,
+        'top_family_warning': top_family_warning,
         'concentration_chart': concentration_chart,
         'concentration_warning': concentration_warning
     })

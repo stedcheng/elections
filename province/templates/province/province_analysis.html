@@ -11,11 +11,12 @@
     <!-- Family Name Distribution and Dynasty Sizes -->
     <div class="row mb-4">
         <div class="col-md-6">
-            <h5>How are family names (last names and middle names) distributed in the largest dynasty in {{ selected_province }} ({{ selected_year }})?</h5>
-            {% if family_warning %}
-                <div class="alert alert-warning">{{ family_warning }}</div>
+            <h5>What is the largest family name dynasty in {{ selected_province }} ({{ selected_year }})?</h5>
+            {% if top_family_warning %}
+                <div class="alert alert-warning">{{ top_family_warning }}</div>
             {% else %}
-                <div id="family-chart"></div>
+                <div id="top-family-card"></div>
+                <div id="top-family-politicians-card"></div>
             {% endif %}
         </div>
         
@@ -45,11 +46,59 @@
 
 {% block extra_js %}
 <script>
-    {% if family_chart %}
-    var familyChart = JSON.parse('{{ family_chart|escapejs }}');
-    Plotly.newPlot('family-chart', familyChart.data, familyChart.layout);
+    {% if top_family %}
+    const topFamilyCardContainer = document.getElementById('top-family-card');
+    const topFamilyPoliticiansContainer = document.getElementById('top-family-politicians-card');
+    if (topFamilyCardContainer) {
+        topFamilyCardContainer.innerHTML = `
+            <div style="
+                background-color: #f0f8ff; 
+                border: 1px solid #4682b4; 
+                padding: 20px; 
+                border-radius: 10px; 
+                width: fit-content;
+                font-family: Arial, sans-serif;
+                box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+                margin: 20px auto;
+                text-align: center;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            ">
+                <strong style="font-size: 1.1em; margin-bottom: 8px;">Most Prominent Family Name:</strong>
+                <span style="color: #1f4e79; font-size: 1.5em; font-weight: 600; margin-bottom: 5px;">
+                    {{ top_family.Family }}
+                </span>
+                <span style="font-weight: bold; color: #d9534f; font-size: 1.1em;">
+                    {{ top_family.Count }} Family Members
+                </span>
+            </div>
+        `;
+    }
+        if (topFamilyPoliticiansContainer) {
+        topFamilyPoliticiansContainer.innerHTML = `
+            <div style="
+                background-color: #fff8dc; 
+                border: 1px solid #daa520; 
+                padding: 15px; 
+                border-radius: 10px; 
+                width: fit-content;
+                font-family: Arial, sans-serif;
+                box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+                margin: 10px auto;
+                text-align: center;
+            ">
+                <strong style="font-size: 1.1em; margin-bottom: 8px; display: block;">Politicians in this Family:</strong>
+                <ul style="list-style-type: disc; margin: 0; padding-left: 20px; text-align: left;">
+                    {% for politician in top_family.Politicians %}
+                        <li>{{ politician }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        `;
+    }
     {% endif %}
-    
+        
     {% if dynasty_chart %}
     var dynastyChart = JSON.parse('{{ dynasty_chart|escapejs }}');
     Plotly.newPlot('dynasty-chart', dynastyChart.data, dynastyChart.layout);
