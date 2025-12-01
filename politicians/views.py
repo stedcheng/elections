@@ -119,8 +119,14 @@ def politicianrecord_update(request, slug, record_id):
         elif request.method == "POST":
             rf = PoliticianRecordForm(request.POST, instance = record)
             if rf.is_valid():
-                rf.save()
-                return redirect('politicians:politician_view', slug = slug)
+                # Check for validity of region and province pairing before saving the record.
+                region = rf.cleaned_data['region']
+                province = rf.cleaned_data['province']
+                if province not in region.province_set.all():
+                    messages.error(request, f"{province.name} and {region.name} are an invalid pair. Please try again.")
+                else:
+                    rf.save()
+                    return redirect('politicians:politician_view', slug = slug)
         context = {
             'politician' : politician,
             'record' : record,
