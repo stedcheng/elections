@@ -1,0 +1,16 @@
+{% extends 'politicians/base_template.html' %}
+{% block pagetitle %}Update Politician Record{% endblock %}
+{% block maincontent %}
+<h2>Update Politician Record of {{ politician }}</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ record_form.as_ul }}
+    <a href="{% url 'politicians:politician_view' politician.slug %}">Cancel</a>
+    <input type="submit" value="Submit">
+</form>
+<ul>
+    {% for message in messages %}
+        <li>{{message}}</li>
+    {% endfor %}
+</ul> 
+{% endblock %}

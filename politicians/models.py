@@ -1,12 +1,24 @@
 from django.db import models
 import numpy as np
+from django.utils.text import slugify
 
 # Create your models here.
+
+def custom_slugify(first_name, middle_name, last_name):
+    if middle_name is None:
+        middle_name = ""
+    full_name = " ".join([
+        first_name.strip().replace(" ", "_").replace("-", "_"),
+        middle_name.strip().replace(" ", "_").replace("-", "_"),
+        last_name.strip().replace(" ", "_").replace("-", "_"),
+    ])
+    return slugify(full_name)
 
 class Politician(models.Model):
     last_name = models.CharField(max_length = 100)
     first_name = models.CharField(max_length = 100)
     middle_name = models.CharField(max_length = 100, blank = True, null = True)
+    slug = models.SlugField(unique = True, max_length = 300)
 
     # Uppercase for consistency
     def save(self, *args, **kwargs):
@@ -16,14 +28,13 @@ class Politician(models.Model):
             self.middle_name = self.middle_name.upper()
         if self.last_name:
             self.last_name = self.last_name.upper()
+        self.slug = custom_slugify(self.first_name, self.middle_name, self.last_name)
         super().save(*args, **kwargs)
 
     def __str__(self):
         name_parts = []
         name_parts.append(self.first_name)
-        # Assumption: Empty cells upon populating the database got stored as "nan" strings due to models.CharField().
-        # Temporary fix: Check for the "nan" string, since we assume that entries are in uppercase.
-        if self.middle_name != "nan":
+        if self.middle_name is not None:
             name_parts.append(self.middle_name)
         name_parts.append(self.last_name)
         return " ".join(name_parts)
@@ -47,19 +58,19 @@ class PoliticianRecord(models.Model):
     province = models.ForeignKey(Province, on_delete = models.PROTECT)
 
     position_choices = [
-    ("COUNCILOR", "COUNCILOR"),
-    ("PROVINCIAL BOARD MEMBER", "PROVINCIAL BOARD MEMBER"),
-    ("VICE MAYOR", "VICE MAYOR"),
-    ("VICE GOVERNOR", "VICE GOVERNOR"),
-    ("MAYOR", "MAYOR"),
-    ("MEMBER, HOUSE OF REPRESENTATIVES", "MEMBER, HOUSE OF REPRESENTATIVES"),
-    ("GOVERNOR", "GOVERNOR"),
+        ("COUNCILOR", "COUNCILOR"),
+        ("PROVINCIAL BOARD MEMBER", "PROVINCIAL BOARD MEMBER"),
+        ("VICE MAYOR", "VICE MAYOR"),
+        ("VICE GOVERNOR", "VICE GOVERNOR"),
+        ("MAYOR", "MAYOR"),
+        ("MEMBER, HOUSE OF REPRESENTATIVES", "MEMBER, HOUSE OF REPRESENTATIVES"),
+        ("GOVERNOR", "GOVERNOR"),
     ]
     position = models.CharField(max_length = 100, choices = position_choices)
 
     party = models.CharField(max_length = 100, blank = True, null = True)
 
-    year_choices = {(year, year) for year in range(2004, 2023, 3)}
+    year_choices = [(year, year) for year in range(2004, 2023, 3)]
     year = models.IntegerField(choices = year_choices)
 
     community = models.IntegerField()
@@ -73,6 +84,9 @@ class PoliticianRecord(models.Model):
         'MEMBER, HOUSE OF REPRESENTATIVES' : 5,
         'GOVERNOR' : 5
     }
+
+    class Meta:
+        ordering = ['year']
     
     def position_weight(self):
         return self.position_weight_dict.get(self.position, 0)

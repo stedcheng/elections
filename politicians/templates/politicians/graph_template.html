@@ -1,0 +1,47 @@
+{% extends 'politicians/base_template.html' %}
+{% block pagetitle %}Politician Graph{% endblock %}
+{% block maincontent %}
+
+<div class="col-md-3">
+    <div class="card">
+        <div class="card-header">
+            <h5>Select Options</h5>
+        </div>
+        <div class="card-body">
+            <form id="filterForm" method="get">
+                <div class="mb-3">
+                    <label for="province" class="form-label">Select a Province</label>
+                    <select class="form-select" name="province" id="province">
+                        {% for province in provinces %}
+                            <option value="{{ province }}" {% if province == selected_province %}selected{% endif %}>
+                                {{ province }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="year" class="form-label">Select a Year</label>
+                    <select class="form-select" name="year" id="year">
+                        {% for year in years %}
+                            <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>
+                                {{ year }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Update</button>
+            </form>
+            {% block sidebar_extra %}{% endblock %}
+        </div>
+    </div>
+</div>
+
+<h2>Static Network Graph</h2>
+<img src="data:image/png;base64,{{ static_graph }}" alt="Political Network Graph" class="img-fluid"/>
+
+<h2>Interactive Network Graph</h2>
+<div style="width:100%; height:600px;">
+    {{ interactive_html|safe }}
+</div>
+
+{% endblock %}

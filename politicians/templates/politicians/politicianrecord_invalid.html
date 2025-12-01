@@ -1,0 +1,11 @@
+{% extends 'politicians/base_template.html' %}
+{% block pagetitle %}{{ action_name }} Politician Record{% endblock %}
+{% block maincontent %}
+<h2>{{ action_name }} Politician Record</h2>
+Sorry, this link is invalid. Please check your input.
+<ul>
+    <li>Politician: {{ politician }}</li>
+    <li>Record: {{ record }}</li>
+</ul>
+
+{% endblock %}

@@ -1,6 +1,5 @@
-from django.forms import ModelForm, HiddenInput, ChoiceField
-from .models import Politician, Region, Province, PoliticianRecord
-import pandas as pd
+from django.forms import ModelForm
+from .models import Politician, PoliticianRecord
 
 class PoliticianForm(ModelForm):
     class Meta:

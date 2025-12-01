@@ -1,0 +1,14 @@
+{% extends 'politicians/base_template.html' %}
+{% block pagetitle %}Update Politician Record{% endblock %}
+{% block maincontent %}
+<h2>Delete Politician Record of {{ politician }}</h2>
+<form method="post">
+    {% csrf_token %}
+    <p>Are you sure you want to delete {{ record }}?</p>
+    {% if one_record_left %} 
+        <p>Since this is the last record for this politician, you will also be deleting {{ politician }}.</p>
+    {% endif %}
+    <a href="{% url 'politicians:politician_view' politician.slug %}">Cancel</a>
+    <input type="submit" value="Yes"> 
+</form>
+{% endblock %}

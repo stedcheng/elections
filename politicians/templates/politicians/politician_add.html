@@ -1,14 +1,22 @@
 {% extends 'politicians/base_template.html' %}
-{% block pagetitle %}Politician Form{% endblock %}
+{% block pagetitle %}Add Politician Record{% endblock %}
 {% block maincontent %}
 <h2>Add Politician Record</h2>
 <form method="post">
     {% csrf_token %}
-    <p>Politician</p>
-    {{ politician_form.as_ul }}
-    <p>-----</p>
-    <p>Politician Record</p>
+    <h3>Politician</h3>
+    {% if politician %}
+        {{ politician }}
+    {% else %}
+        {{ politician_form.as_ul }}
+    {% endif %}
+    <h3>Politician Record</h3>
     {{ record_form.as_ul }}
+    {% if politician %}
+        <a href="{% url 'politicians:politician_view' politician.slug %}">Cancel</a>
+    {% else %}
+        <a href="{% url 'politicians:index' %}">Cancel</a>
+    {% endif %}
     <input type="submit" value="Submit">
 </form>
 <ul>
