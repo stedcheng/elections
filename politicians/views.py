@@ -1,10 +1,15 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import custom_slugify, Politician, PoliticianRecord
+from .models import custom_slugify, Politician, PoliticianRecord, Province
 from .forms import PoliticianForm, PoliticianRecordForm
 from django.http import HttpResponse
 from django.contrib import messages
 import numpy as np
 from django.utils.text import slugify
+from .graph import *  
+import os
+from django.conf import settings
+import json
+from django.templatetags.static import static
 
 # Create your views here.
 
@@ -17,10 +22,21 @@ def politician_view(request, slug):
     # Extract the politician and their records.
     politician = Politician.objects.get(slug = slug)
     records = PoliticianRecord.objects.filter(politician = politician)
+
+    # Extract extra information for featured politicians based on JSON files
+    featured_politician_slugs = ["francisco-moreno-domagoso", "ma_josefina-go-belmonte", "datu_andal-uy-ampatuan", "stephany-uy-tan", "ma_theresa-bonoan_david"]
+    if slug in featured_politician_slugs:
+        json_path = os.path.join(settings.BASE_DIR, f"politicians/json_data/{slug}.json")
+        with open(json_path, "r", encoding = "utf-8") as f:
+            extra_info = json.load(f)
+    else:
+        extra_info = {}
     context = {
         'politician': politician,
-        'records' : records
+        'records' : records,
+        'extra_info' : extra_info
     }
+
     return render(request, 'politicians/politician_view.html', context)
 
 # Add a politician (together with a politician record).
@@ -158,3 +174,33 @@ def politicianrecord_delete(request, slug, record_id):
                 record.delete()
                 # Index page for now, can be overview page later
                 return redirect("politicians:politician_view", slug = politician.slug)
+
+def get_base_context(request):
+    provinces = list(Province.objects.order_by("name").values_list("name", flat = True))
+    years = [2004, 2007, 2010, 2013, 2016, 2019, 2022]
+    selected_province = request.GET.get("province", provinces[0] if provinces else None)
+    selected_year = int(request.GET.get("year", years[-1] if years else 2022))
+    return {
+        "provinces": provinces,
+        "years": years,
+        "selected_province": selected_province,
+        "selected_year": selected_year,
+    }
+     
+def plot_graph(request):
+    context = get_base_context(request)
+    
+    province = context['selected_province']
+    year = context['selected_year']
+    degree_threshold = 2
+
+    am_df, unique_records, name_data = generate_graph(province, year)
+    G_filtered, above_threshold, above_threshold_community, communities = generate_filtered_graph(am_df, unique_records, name_data, degree_threshold)
+    static_graph, pos = display_static_graph(province, year, degree_threshold, G_filtered, above_threshold, communities)
+    interactive_html = get_interactive_html(degree_threshold, above_threshold, communities, G_filtered, pos)
+    context.update({
+        "static_graph" : static_graph,
+        "interactive_html" : interactive_html
+    })
+    return render(request, 'politicians/graph_template.html', context)
+

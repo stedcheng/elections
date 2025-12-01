@@ -1,5 +1,12 @@
 {% extends 'politicians/base_template.html' %}
+{% load static %}
+
 {% block pagetitle %}View Politician Records{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/politicians_template.css' %}">
+{% endblock %}
+
 {% block maincontent %}
 <h2>Records of {{ politician }}</h2>
 <a href="{% url 'politicians:politician_update' politician.slug %}">Update Politician</a>
@@ -17,6 +24,85 @@
 {% else %}
 <p>No records found.</p>
 {% endif %}
+
+{% if extra_info %}
+<div class="title" style="text-align:center;">
+    <img src="{% static extra_info.image %}" id="profile" style="width:250px; border-radius:20px;">
+    <p id="name" class="main-name">{{ extra_info.name }}</p>
+    <p class="party">{{ extra_info.party }}</p>
+    <p><b>Age:</b> {{ extra_info.age }}</p>
+    <p><b>Birthplace:</b> {{ extra_info.birthplace }}</p>
+</div>
+
+<div class="body">
+
+    <!-- EDUCATION -->
+    {% if extra_info.education %}
+    <p class="section-title">Educational Attainment</p>
+    <ul class="section-list">
+        {% for item in extra_info.education %}
+        <li>{{ item }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <!-- POSITIONS -->
+    {% if extra_info.positions %}
+    <p class="section-title">Political Career</p>
+    <ul class="section-list">
+        {% for role in extra_info.positions %}
+        <li>{{ role }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <!-- POLITICAL PARTIES -->
+    {% if extra_info.political_parties %}
+    <p class="section-title">Political Parties</p>
+    <ul class="section-list">
+        {% for pty in extra_info.political_parties %}
+            <li>
+                <b>{{ pty.party }}</b> 
+                {% if pty.years %} ({{ pty.years }}){% endif %}
+                {% if pty.note %} - {{ pty.note }}{% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <!-- POLICIES -->
+    {% if extra_info.policies %}
+    <p class="section-title">Policies / Programs</p>
+    <ul class="section-list">
+        {% for item in extra_info.policies %}
+        <li>{{ item }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <!-- AWARDS -->
+    {% if extra_info.awards %}
+    <p class="section-title">Awards / Honors</p>
+    <ul class="section-list">
+        {% for item in extra_info.awards %}
+        <li>{{ item }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <!-- ISSUES -->
+    {% if extra_info.issues %}
+    <p class="section-title">Controversies / Issues</p>
+    <ul class="section-list">
+        {% for item in extra_info.issues %}
+        <li>{{ item }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+</div>
+{% endif %}
+
 <ul>
     {% for message in messages %}
         <li>{{message}}</li>
