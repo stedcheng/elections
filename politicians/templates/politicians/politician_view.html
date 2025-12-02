@@ -30,7 +30,7 @@
             <p style="color: #666; margin: 5px 0;"><strong>Birthplace:</strong> {{ extra_info.birthplace }}</p>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
             {% if extra_info.education %}
             <div>
                 <h4 style="color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">Educational Attainment</h4>
@@ -42,27 +42,12 @@
             </div>
             {% endif %}
 
-            {% if extra_info.positions %}
+            {% if extra_info.awards %}
             <div>
-                <h4 style="color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">Political Career</h4>
+                <h4 style="color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">Awards / Honors</h4>
                 <ul style="list-style-type: disc; padding-left: 20px; line-height: 1.6;">
-                    {% for role in extra_info.positions %}
-                    <li style="margin-bottom: 5px;">{{ role }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-            {% endif %}
-
-            {% if extra_info.political_parties %}
-            <div>
-                <h4 style="color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">Political Parties</h4>
-                <ul style="list-style-type: disc; padding-left: 20px; line-height: 1.6;">
-                    {% for pty in extra_info.political_parties %}
-                    <li style="margin-bottom: 5px;">
-                        <strong>{{ pty.party }}</strong>
-                        {% if pty.years %} ({{ pty.years }}){% endif %}
-                        {% if pty.note %} - {{ pty.note }}{% endif %}
-                    </li>
+                    {% for item in extra_info.awards %}
+                    <li style="margin-bottom: 5px;">{{ item }}</li>
                     {% endfor %}
                 </ul>
             </div>
@@ -73,17 +58,6 @@
                 <h4 style="color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">Policies / Programs</h4>
                 <ul style="list-style-type: disc; padding-left: 20px; line-height: 1.6;">
                     {% for item in extra_info.policies %}
-                    <li style="margin-bottom: 5px;">{{ item }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-            {% endif %}
-
-            {% if extra_info.awards %}
-            <div>
-                <h4 style="color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">Awards / Honors</h4>
-                <ul style="list-style-type: disc; padding-left: 20px; line-height: 1.6;">
-                    {% for item in extra_info.awards %}
                     <li style="margin-bottom: 5px;">{{ item }}</li>
                     {% endfor %}
                 </ul>
@@ -122,7 +96,7 @@
                     {% endif %}
                     <div style="margin-top: 10px;">
                         <a href="{% url 'politicians:politicianrecord_update' record.politician.slug record.id %}" 
-                           style="background-color: #f0f0f0; padding: 4px 8px; text-decoration: none; color: #333; border: 1px solid #ddd; border-radius: 3px; font-size: 0.9em; margin-right: 10px;">Update</a>
+                           style="background-color: #007bff; padding: 4px 8px; text-decoration: none; color: white; border: 1px solid #007bff; border-radius: 3px; font-size: 0.9em; margin-right: 10px;">Update</a>
                         <a href="{% url 'politicians:politicianrecord_delete' record.politician.slug record.id %}" 
                            style="background-color: #fff0f0; padding: 4px 8px; text-decoration: none; color: #d33; border: 1px solid #fbb; border-radius: 3px; font-size: 0.9em;">Delete</a>
                     </div>

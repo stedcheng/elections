@@ -4,11 +4,11 @@
 
 {% block maincontent %}
 <div style="margin-bottom: 20px;">
-    <a href="{% url 'overview:dashboard' %}" style="text-decoration: none; color: #666;">← Back to Dashboard</a>
+    <a href="{% url 'overview:dashboard' %}" class="back-link">← Back to Dashboard</a>
 </div>
 
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-    <h2 style="margin: 0;">All Politicians ({{ total_count }} total)</h2>
+    <h2 style="margin: 0;">All Politicians</h2>
     <a href="{% url 'politicians:politician_add' %}" style="background-color: #f0f0f0; padding: 8px 16px; text-decoration: none; color: #333; border: 1px solid #ddd; border-radius: 4px;">Add New Politician</a>
 </div>
 
@@ -17,9 +17,9 @@
     <div style="display: flex; gap: 10px; align-items: center;">
         <input type="text" name="search" value="{{ search_query }}" placeholder="Search politicians..." 
                style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; flex: 1; max-width: 300px;">
-        <button type="submit" style="padding: 8px 16px; background-color: #f0f0f0; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">Search</button>
+        <button type="submit" style="padding: 8px 16px; background-color: #f0f0f0; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; font-size: 14px; font-family: Arial, sans-serif; height: 36px; box-sizing: border-box;">Search</button>
         {% if search_query %}
-        <a href="{% url 'politicians:index' %}" style="padding: 8px 16px; background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 4px; text-decoration: none; color: #666;">Clear</a>
+        <a href="{% url 'politicians:index' %}" style="padding: 8px 16px; background-color: #f0f0f0; border: 1px solid #ddd; border-radius: 4px; text-decoration: none; color: #000; display: inline-block; font-size: 14px; font-family: Arial, sans-serif; height: 36px; box-sizing: border-box; line-height: 20px;">Clear</a>
         {% endif %}
     </div>
 </form>
@@ -41,7 +41,7 @@
         </h3>
         <div style="color: #666; font-size: 0.9em;">
             {% with politician.politicianrecord_set.count as record_count %}
-            {{ record_count }} records
+            {{ record_count }} record{{ record_count|pluralize }}
             {% endwith %}
         </div>
         <div style="margin-top: 10px;">
@@ -52,7 +52,7 @@
     {% endfor %}
 </div>
 
-{% if total_count > 50 %}
+{% if total_count >= 50 %}
 <p style="margin-top: 20px; color: #666; font-style: italic;">
     Showing first 50 politicians only.
 </p>
