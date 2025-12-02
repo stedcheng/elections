@@ -1,44 +1,86 @@
 {% extends 'province/base.html' %}
 {% load static %}
 
-{% block title %} Visualizations on Provincial Data {% endblock %}
+{% block title %}Province Analysis{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <h1>Political Dynastic Ties Analysis on Provincial Level</h1>
-    <p class="text-muted">Analyze dynasty structures and family name distributions in {{ selected_province }} ({{ selected_year }})</p>
+<div class="container">
+    <a href="{% url 'overview:dashboard' %}" class="back-link">← Back to Dashboard</a>
     
-    <!-- Family Name Distribution and Dynasty Sizes -->
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <h5>What is the largest family name dynasty in {{ selected_province }} ({{ selected_year }})?</h5>
-            {% if top_family_warning %}
-                <div class="alert alert-warning">{{ top_family_warning }}</div>
-            {% else %}
-                <div id="top-family-card"></div>
-                <div id="top-family-politicians-card"></div>
-            {% endif %}
-        </div>
-        
-        <div class="col-md-6">
-            <h5>What are the sizes of the dynasties in {{ selected_province }} ({{ selected_year }})? Which family name appears the most in these dynasties?</h5>
-            {% if dynasty_warning %}
-                <div class="alert alert-warning">{{ dynasty_warning }}</div>
-            {% else %}
-                <div id="dynasty-chart"></div>
-            {% endif %}
-        </div>
+    <div class="header">
+        <h1>Province Analysis</h1>
+        <p>Analyze dynasty structures and family name distributions by province and year</p>
     </div>
-    
-    <!-- Concentration Analysis -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <h5>How is family name concentration in {{ selected_province }} ({{ selected_year }}) related to their average position weight? Where do the largest dynasties land on this scale?</h5>
-            {% if concentration_warning %}
-                <div class="alert alert-warning">{{ concentration_warning }}</div>
-            {% else %}
-                <div id="concentration-chart"></div>
-            {% endif %}
+
+    <div class="content-grid">
+        <!-- Controls sidebar -->
+        <div class="controls-section">
+            <div class="controls-header">Select Options</div>
+            <form method="get">
+                <div class="form-group">
+                    <label for="province">Select a Province</label>
+                    <select class="form-control" name="province" id="province">
+                        {% for province in provinces %}
+                            <option value="{{ province }}" {% if province == selected_province %}selected{% endif %}>
+                                {{ province }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="year">Select a Year</label>
+                    <select class="form-control" name="year" id="year">
+                        {% for year in years %}
+                            <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>
+                                {{ year }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn">Update Analysis</button>
+            </form>
+        </div>
+
+        <!-- Main content area -->
+        <div>
+            <h2 style="margin-bottom: 20px; color: #333;">Analysis for {{ selected_province }} ({{ selected_year }})</h2>
+            
+            <!-- Family Name Analysis -->
+            <div class="chart-section">
+                <div class="chart-header">Largest Family Dynasty</div>
+                <div class="chart-content">
+                    {% if top_family_warning %}
+                        <div class="alert">{{ top_family_warning }}</div>
+                    {% else %}
+                        <div id="top-family-card"></div>
+                        <div id="top-family-politicians-card"></div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Dynasty Sizes -->
+            <div class="chart-section">
+                <div class="chart-header">Dynasty Sizes and Family Names</div>
+                <div class="chart-content">
+                    {% if dynasty_warning %}
+                        <div class="alert">{{ dynasty_warning }}</div>
+                    {% else %}
+                        <div id="dynasty-chart"></div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Concentration Analysis -->
+            <div class="chart-section">
+                <div class="chart-header">Family Name Concentration vs Position Weight</div>
+                <div class="chart-content">
+                    {% if concentration_warning %}
+                        <div class="alert">{{ concentration_warning }}</div>
+                    {% else %}
+                        <div id="concentration-chart"></div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
 </div>

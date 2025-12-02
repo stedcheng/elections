@@ -1,16 +1,105 @@
 {% extends 'politicians/base_template.html' %}
-{% block pagetitle %}Update Politician Record{% endblock %}
+{% block pagetitle %}Update Record for {{ politician }}{% endblock %}
 {% block maincontent %}
-<h2>Update Politician Record of {{ politician }}</h2>
-<form method="post">
+
+<a href="{% url 'politicians:politician_view' politician.slug %}" class="back-link">← Back to {{ politician }}</a>
+
+<h2 style="margin-bottom: 20px; color: #333;">Update Political Record</h2>
+<p style="color: #666; margin-bottom: 30px;">Updating record for <strong>{{ politician }}</strong></p>
+
+<form method="post" style="max-width: 800px;">
     {% csrf_token %}
-    {{ record_form.as_ul }}
-    <a href="{% url 'politicians:politician_view' politician.slug %}">Cancel</a>
-    <input type="submit" value="Submit">
+    
+    <!-- Political Record Section -->
+    <div style="border: 1px solid #ddd; border-radius: 6px; overflow: hidden; margin-bottom: 30px;">
+        <div style="background-color: #fafafa; padding: 15px; border-bottom: 1px solid #ddd; font-weight: bold; color: #333;">
+            Political Record Details
+        </div>
+        <div style="padding: 20px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div class="form-group">
+                    <label for="{{ record_form.position.id_for_label }}" style="display: block; margin-bottom: 5px; color: #333; font-weight: 500;">Position</label>
+                    {{ record_form.position }}
+                    {% if record_form.position.errors %}
+                        <div style="color: #d33; font-size: 0.9em; margin-top: 5px;">{{ record_form.position.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="{{ record_form.party.id_for_label }}" style="display: block; margin-bottom: 5px; color: #333; font-weight: 500;">Party</label>
+                    {{ record_form.party }}
+                    {% if record_form.party.errors %}
+                        <div style="color: #d33; font-size: 0.9em; margin-top: 5px;">{{ record_form.party.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="{{ record_form.year.id_for_label }}" style="display: block; margin-bottom: 5px; color: #333; font-weight: 500;">Year</label>
+                    {{ record_form.year }}
+                    {% if record_form.year.errors %}
+                        <div style="color: #d33; font-size: 0.9em; margin-top: 5px;">{{ record_form.year.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="{{ record_form.region.id_for_label }}" style="display: block; margin-bottom: 5px; color: #333; font-weight: 500;">Region</label>
+                    {{ record_form.region }}
+                    {% if record_form.region.errors %}
+                        <div style="color: #d33; font-size: 0.9em; margin-top: 5px;">{{ record_form.region.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="{{ record_form.province.id_for_label }}" style="display: block; margin-bottom: 5px; color: #333; font-weight: 500;">Province</label>
+                    {{ record_form.province }}
+                    {% if record_form.province.errors %}
+                        <div style="color: #d33; font-size: 0.9em; margin-top: 5px;">{{ record_form.province.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="{{ record_form.community.id_for_label }}" style="display: block; margin-bottom: 5px; color: #333; font-weight: 500;">Community</label>
+                    {{ record_form.community }}
+                    {% if record_form.community.errors %}
+                        <div style="color: #d33; font-size: 0.9em; margin-top: 5px;">{{ record_form.community.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Action buttons -->
+    <div style="margin-bottom: 30px;">
+        <button type="submit" class="btn" style="background-color: #007bff; color: white; border-color: #007bff; margin-right: 10px;">Update Record</button>
+        <a href="{% url 'politicians:politician_view' politician.slug %}" class="btn">Cancel</a>
+    </div>
 </form>
-<ul>
+
+<!-- Messages -->
+{% if messages %}
+<div style="margin-bottom: 20px;">
     {% for message in messages %}
-        <li>{{message}}</li>
+    <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; color: #856404; padding: 12px; border-radius: 4px; margin-bottom: 10px;">
+        {{ message }}
+    </div>
     {% endfor %}
-</ul> 
+</div>
+{% endif %}
+
+<style>
+.form-group input[type="text"], 
+.form-group input[type="number"], 
+.form-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: white;
+}
+
+.form-group input[type="text"]:focus, 
+.form-group input[type="number"]:focus, 
+.form-group select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+</style>
+
 {% endblock %}

@@ -1,14 +1,49 @@
 {% extends 'politicians/base_template.html' %}
-{% block pagetitle %}Update Politician Record{% endblock %}
+{% block pagetitle %}Delete Record for {{ politician }}{% endblock %}
 {% block maincontent %}
-<h2>Delete Politician Record of {{ politician }}</h2>
-<form method="post">
+
+<a href="{% url 'politicians:politician_view' politician.slug %}" class="back-link">← Back to {{ politician }}</a>
+
+<h2 style="margin-bottom: 20px; color: #333;">Delete Political Record</h2>
+<p style="color: #666; margin-bottom: 30px;">Confirm deletion of record for <strong>{{ politician }}</strong></p>
+
+<form method="post" style="max-width: 800px;">
     {% csrf_token %}
-    <p>Are you sure you want to delete {{ record }}?</p>
-    {% if one_record_left %} 
-        <p>Since this is the last record for this politician, you will also be deleting {{ politician }}.</p>
-    {% endif %}
-    <a href="{% url 'politicians:politician_view' politician.slug %}">Cancel</a>
-    <input type="submit" value="Yes"> 
+    
+    <!-- Confirmation Section -->
+    <div style="border: 1px solid #ddd; border-radius: 6px; overflow: hidden; margin-bottom: 30px;">
+        <div style="background-color: #fafafa; padding: 15px; border-bottom: 1px solid #ddd; font-weight: bold; color: #333;">
+            Confirm Deletion
+        </div>
+        <div style="padding: 20px;">
+            <p style="margin: 0 0 15px 0; color: #333; font-size: 1.1em;">
+                Are you sure you want to delete this record?
+            </p>
+            
+            <!-- Record details -->
+            <div style="background-color: #fafafa; border: 1px solid #ddd; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
+                <div style="font-weight: 500; margin-bottom: 5px;">{{ record.position }}</div>
+                <div style="color: #666; margin-bottom: 5px;">{{ record.province.name }}, {{ record.region.name }} ({{ record.year }})</div>
+                {% if record.party %}
+                <div style="color: #666;"><strong>Party:</strong> {{ record.party }}</div>
+                {% endif %}
+            </div>
+            
+            {% if one_record_left %}
+            <div style="background-color: #f9f9f9; border: 1px solid #ddd; padding: 12px; border-radius: 4px;">
+                <strong>Warning:</strong> Since this is the last record for this politician, deleting it will also delete <strong>{{ politician }}</strong> completely.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Action buttons -->
+    <div style="margin-bottom: 30px;">
+        <button type="submit" class="btn" style="margin-right: 10px;">
+            {% if one_record_left %}Delete Politician{% else %}Delete Record{% endif %}
+        </button>
+        <a href="{% url 'politicians:politician_view' politician.slug %}" class="btn">Cancel</a>
+    </div>
 </form>
+
 {% endblock %}

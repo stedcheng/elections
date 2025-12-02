@@ -9,7 +9,7 @@ class PoliticianForm(ModelForm):
 class PoliticianRecordForm(ModelForm):
     class Meta:
         model = PoliticianRecord
-        fields = ['position', 'party', 'year', 'region', 'province']
+        fields = ['position', 'party', 'year', 'region', 'province', 'community']
         
     # def __init__(self, *args, **kwargs):
     #     super().__init__(*args, **kwargs)

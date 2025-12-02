@@ -16,17 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.urls import include, path
-from django.http import HttpResponse
-# from django.conf.urls import handler404
-# from django.views.defaults import page_not_found
-
-def helloworld(request):
-    return HttpResponse('<p>Hello World!<p>')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', helloworld),
+    path('', include('overview.urls')),
     path('province/', include('province.urls')),
     path('politicians/', include('politicians.urls'))
 ]

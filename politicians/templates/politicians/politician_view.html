@@ -1,111 +1,149 @@
 {% extends 'politicians/base_template.html' %}
 {% load static %}
 
-{% block pagetitle %}View Politician Records{% endblock %}
-
-{% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/politicians_template.css' %}">
-{% endblock %}
+{% block pagetitle %}{{ politician }}{% endblock %}
 
 {% block maincontent %}
-<h2>Records of {{ politician }}</h2>
-<a href="{% url 'politicians:politician_update' politician.slug %}">Update Politician</a>
-<a href="{% url 'politicians:politicianrecord_add' politician.slug %}">Add Record</a>
-{% if records %}
-    <ul>
-        {% for record in records %}
-            <li> 
-                {{ record }} 
-                <a href="{% url 'politicians:politicianrecord_update' record.politician.slug record.id %}">Update Record</a>
-                <a href="{% url 'politicians:politicianrecord_delete' record.politician.slug record.id %}">Delete Record</a>
-            </li>
-        {% endfor %}
-    </ul>
-{% else %}
-<p>No records found.</p>
-{% endif %}
+<a href="{% url 'politicians:index' %}" class="back-link">← Back to Politicians List</a>
+
+<h2 style="margin-bottom: 20px; color: #333;">{{ politician }}</h2>
+
+<!-- Action buttons -->
+<div style="margin-bottom: 30px;">
+    <a href="{% url 'politicians:politician_update' politician.slug %}" class="btn" style="margin-right: 10px;">Update Politician</a>
+    <a href="{% url 'politicians:politicianrecord_add' politician.slug %}" class="btn">Add Record</a>
+</div>
 
 {% if extra_info %}
-<div class="title" style="text-align:center;">
-    <img src="{% static extra_info.image %}" id="profile" style="width:250px; border-radius:20px;">
-    <p id="name" class="main-name">{{ extra_info.name }}</p>
-    <p class="party">{{ extra_info.party }}</p>
-    <p><b>Age:</b> {{ extra_info.age }}</p>
-    <p><b>Birthplace:</b> {{ extra_info.birthplace }}</p>
-</div>
+<!-- Featured politician profile -->
+<div style="border: 1px solid #ddd; border-radius: 6px; overflow: hidden; margin-bottom: 30px;">
+    <div style="background-color: #fafafa; padding: 15px; border-bottom: 1px solid #ddd; font-weight: bold; color: #333;">
+        Politician Profile
+    </div>
+    <div style="padding: 20px;">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <img src="{% static extra_info.image %}" alt="{{ extra_info.name }}" 
+                 style="width: 200px; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 15px;">
+            <h3 style="margin: 0; color: #333;">{{ extra_info.name }}</h3>
+            <p style="color: #666; margin: 5px 0;">{{ extra_info.party }}</p>
+            <p style="color: #666; margin: 5px 0;"><strong>Age:</strong> {{ extra_info.age }}</p>
+            <p style="color: #666; margin: 5px 0;"><strong>Birthplace:</strong> {{ extra_info.birthplace }}</p>
+        </div>
 
-<div class="body">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+            {% if extra_info.education %}
+            <div>
+                <h4 style="color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">Educational Attainment</h4>
+                <ul style="list-style-type: disc; padding-left: 20px; line-height: 1.6;">
+                    {% for item in extra_info.education %}
+                    <li style="margin-bottom: 5px;">{{ item }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
 
-    <!-- EDUCATION -->
-    {% if extra_info.education %}
-    <p class="section-title">Educational Attainment</p>
-    <ul class="section-list">
-        {% for item in extra_info.education %}
-        <li>{{ item }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
+            {% if extra_info.positions %}
+            <div>
+                <h4 style="color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">Political Career</h4>
+                <ul style="list-style-type: disc; padding-left: 20px; line-height: 1.6;">
+                    {% for role in extra_info.positions %}
+                    <li style="margin-bottom: 5px;">{{ role }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
 
-    <!-- POSITIONS -->
-    {% if extra_info.positions %}
-    <p class="section-title">Political Career</p>
-    <ul class="section-list">
-        {% for role in extra_info.positions %}
-        <li>{{ role }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
+            {% if extra_info.political_parties %}
+            <div>
+                <h4 style="color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">Political Parties</h4>
+                <ul style="list-style-type: disc; padding-left: 20px; line-height: 1.6;">
+                    {% for pty in extra_info.political_parties %}
+                    <li style="margin-bottom: 5px;">
+                        <strong>{{ pty.party }}</strong>
+                        {% if pty.years %} ({{ pty.years }}){% endif %}
+                        {% if pty.note %} - {{ pty.note }}{% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
 
-    <!-- POLITICAL PARTIES -->
-    {% if extra_info.political_parties %}
-    <p class="section-title">Political Parties</p>
-    <ul class="section-list">
-        {% for pty in extra_info.political_parties %}
-            <li>
-                <b>{{ pty.party }}</b> 
-                {% if pty.years %} ({{ pty.years }}){% endif %}
-                {% if pty.note %} - {{ pty.note }}{% endif %}
-            </li>
-        {% endfor %}
-    </ul>
-    {% endif %}
+            {% if extra_info.policies %}
+            <div>
+                <h4 style="color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">Policies / Programs</h4>
+                <ul style="list-style-type: disc; padding-left: 20px; line-height: 1.6;">
+                    {% for item in extra_info.policies %}
+                    <li style="margin-bottom: 5px;">{{ item }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
 
-    <!-- POLICIES -->
-    {% if extra_info.policies %}
-    <p class="section-title">Policies / Programs</p>
-    <ul class="section-list">
-        {% for item in extra_info.policies %}
-        <li>{{ item }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
+            {% if extra_info.awards %}
+            <div>
+                <h4 style="color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">Awards / Honors</h4>
+                <ul style="list-style-type: disc; padding-left: 20px; line-height: 1.6;">
+                    {% for item in extra_info.awards %}
+                    <li style="margin-bottom: 5px;">{{ item }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
 
-    <!-- AWARDS -->
-    {% if extra_info.awards %}
-    <p class="section-title">Awards / Honors</p>
-    <ul class="section-list">
-        {% for item in extra_info.awards %}
-        <li>{{ item }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-
-    <!-- ISSUES -->
-    {% if extra_info.issues %}
-    <p class="section-title">Controversies / Issues</p>
-    <ul class="section-list">
-        {% for item in extra_info.issues %}
-        <li>{{ item }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-
+            {% if extra_info.issues %}
+            <div>
+                <h4 style="color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">Controversies / Issues</h4>
+                <ul style="list-style-type: disc; padding-left: 20px; line-height: 1.6;">
+                    {% for item in extra_info.issues %}
+                    <li style="margin-bottom: 5px;">{{ item }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+    </div>
 </div>
 {% endif %}
 
-<ul>
+<!-- Political records -->
+<div style="border: 1px solid #ddd; border-radius: 6px; overflow: hidden; margin-bottom: 30px;">
+    <div style="background-color: #fafafa; padding: 15px; border-bottom: 1px solid #ddd; font-weight: bold; color: #333;">
+        Political Records
+    </div>
+    <div style="padding: 20px;">
+        {% if records %}
+            <div style="display: grid; gap: 15px;">
+                {% for record in records %}
+                <div style="border: 1px solid #eee; padding: 15px; border-radius: 4px; background-color: #fafafa;">
+                    <div style="font-weight: 500; margin-bottom: 5px;">{{ record.position }}</div>
+                    <div style="color: #666; margin-bottom: 10px;">{{ record.province.name }}, {{ record.region.name }} ({{ record.year }})</div>
+                    {% if record.party %}
+                    <div style="color: #666; margin-bottom: 10px;"><strong>Party:</strong> {{ record.party }}</div>
+                    {% endif %}
+                    <div style="margin-top: 10px;">
+                        <a href="{% url 'politicians:politicianrecord_update' record.politician.slug record.id %}" 
+                           style="background-color: #f0f0f0; padding: 4px 8px; text-decoration: none; color: #333; border: 1px solid #ddd; border-radius: 3px; font-size: 0.9em; margin-right: 10px;">Update</a>
+                        <a href="{% url 'politicians:politicianrecord_delete' record.politician.slug record.id %}" 
+                           style="background-color: #fff0f0; padding: 4px 8px; text-decoration: none; color: #d33; border: 1px solid #fbb; border-radius: 3px; font-size: 0.9em;">Delete</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p style="color: #666; text-align: center; padding: 20px;">No political records found for this politician.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Messages -->
+{% if messages %}
+<div style="margin-bottom: 20px;">
     {% for message in messages %}
-        <li>{{message}}</li>
+    <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; color: #856404; padding: 12px; border-radius: 4px; margin-bottom: 10px;">
+        {{ message }}
+    </div>
     {% endfor %}
-</ul> 
+</div>
+{% endif %}
+
 {% endblock %}

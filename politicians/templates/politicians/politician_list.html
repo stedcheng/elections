@@ -1,0 +1,72 @@
+{% extends 'politicians/base_template.html' %}
+
+{% block pagetitle %}Politicians List{% endblock %}
+
+{% block maincontent %}
+<div style="margin-bottom: 20px;">
+    <a href="{% url 'overview:dashboard' %}" style="text-decoration: none; color: #666;">← Back to Dashboard</a>
+</div>
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+    <h2 style="margin: 0;">All Politicians ({{ total_count }} total)</h2>
+    <a href="{% url 'politicians:politician_add' %}" style="background-color: #f0f0f0; padding: 8px 16px; text-decoration: none; color: #333; border: 1px solid #ddd; border-radius: 4px;">Add New Politician</a>
+</div>
+
+<!-- Search form -->
+<form method="get" style="margin-bottom: 20px;">
+    <div style="display: flex; gap: 10px; align-items: center;">
+        <input type="text" name="search" value="{{ search_query }}" placeholder="Search politicians..." 
+               style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; flex: 1; max-width: 300px;">
+        <button type="submit" style="padding: 8px 16px; background-color: #f0f0f0; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">Search</button>
+        {% if search_query %}
+        <a href="{% url 'politicians:index' %}" style="padding: 8px 16px; background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 4px; text-decoration: none; color: #666;">Clear</a>
+        {% endif %}
+    </div>
+</form>
+
+{% if search_query %}
+<p style="color: #666; margin-bottom: 20px;">
+    Showing results for "{{ search_query }}" ({{ politicians|length }} found)
+</p>
+{% endif %}
+
+<!-- Politicians grid -->
+{% if politicians %}
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+    {% for politician in politicians %}
+    <div style="border: 1px solid #ddd; padding: 15px; border-radius: 6px; background-color: #fafafa;">
+        <h3 style="margin: 0 0 10px 0;">
+            <a href="{% url 'politicians:politician_view' politician.slug %}" 
+               style="text-decoration: none; color: #333;">{{ politician }}</a>
+        </h3>
+        <div style="color: #666; font-size: 0.9em;">
+            {% with politician.politicianrecord_set.count as record_count %}
+            {{ record_count }} records
+            {% endwith %}
+        </div>
+        <div style="margin-top: 10px;">
+            <a href="{% url 'politicians:politician_view' politician.slug %}" 
+               style="font-size: 0.9em; color: #333; text-decoration: none;">View Details →</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if total_count > 50 %}
+<p style="margin-top: 20px; color: #666; font-style: italic;">
+    Showing first 50 politicians only.
+</p>
+{% endif %}
+
+{% else %}
+<div style="text-align: center; padding: 40px; color: #999;">
+    {% if search_query %}
+    No politicians found matching "{{ search_query }}".
+    {% else %}
+    No politicians available.
+    {% endif %}
+</div>
+{% endif %}
+
+
+{% endblock %}

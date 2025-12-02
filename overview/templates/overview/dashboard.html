@@ -1,0 +1,57 @@
+{% extends 'overview/base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="header">
+        <h1>Political Dashboard</h1>
+        <p>Comprehensive analysis of political dynasties and interconnections</p>
+    </div>
+
+    <!-- Project Description Section -->
+    <div class="section" style="margin-bottom: 40px;">
+        <div class="section-header">About This Project</div>
+        <div class="section-content">
+            <p style="line-height: 1.6; color: #333; margin: 0;">
+                This dashboard presents a comprehensive and centralized database of all local politicians in the Philippines, designed as a research-oriented tool for examining patterns of political power, kinship, and governance. Beyond serving as a directory of political profiles, it enables users to explore the intricate web of familial ties, shared surnames, and career overlaps that characterize political dynasties across the country.
+                Through its built-in analytical tools, users can visualize network relationships between politicians, identify clusters of interconnected families, and observe how these networks evolve across election cycles. The platform also offers provincial-level dynasty mapping, allowing researchers, students, and policymakers to compare the concentration, reach, and persistence of dynasties in different regions. By integrating profile data with network visualization, the dashboard provides a deeper and more systematic way of understanding how political influence is distributed, inherited, and reproduced within the Philippine political landscape.
+    
+        </div>
+    </div>
+
+    <!-- Navigation to other apps -->
+    <div class="navigation">
+        <a href="{% url 'politicians:index' %}" class="nav-card">
+            <h3>Politicians</h3>
+            <p>View and manage politician profiles, records, and career trajectories</p>
+        </a>
+        <a href="{% url 'politicians:graph' %}" class="nav-card">
+            <h3>Network Analysis</h3>
+            <p>Interactive graphs showing political connections and relationships</p>
+        </a>
+        <a href="{% url 'province_analysis' %}" class="nav-card">
+            <h3>Province Analysis</h3>
+            <p>Detailed analysis of political dynasties by province and year</p>
+        </a>
+    </div>
+
+    <!-- Quick stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">{{ total_politicians }}</div>
+            <div class="stat-label">Total Politicians</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ total_records }}</div>
+            <div class="stat-label">Political Records</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ total_provinces }}</div>
+            <div class="stat-label">Provinces</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ year_range }}</div>
+            <div class="stat-label">Year Range</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

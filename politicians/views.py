@@ -3,6 +3,7 @@ from .models import custom_slugify, Politician, PoliticianRecord, Province
 from .forms import PoliticianForm, PoliticianRecordForm
 from django.http import HttpResponse
 from django.contrib import messages
+from django.db.models import Q
 import numpy as np
 from django.utils.text import slugify
 from .graph import *  
@@ -15,7 +16,27 @@ from django.templatetags.static import static
 
 # Landing page
 def index(request):
-    return HttpResponse("[TEMPORARY TEXT] You are at the politicians app page.")
+    politicians = Politician.objects.all()
+    total_count = politicians.count()
+    
+    # Get search query if provided
+    search_query = request.GET.get('search', '')
+    if search_query:
+        politicians = politicians.filter(
+            Q(first_name__icontains=search_query) |
+            Q(middle_name__icontains=search_query) |
+            Q(last_name__icontains=search_query)
+        )
+    
+    # Paginate results
+    politicians = politicians.order_by('first_name', 'last_name')[:50]  # Limit to 50 for performance
+    
+    context = {
+        'politicians': politicians,
+        'total_count': total_count,
+        'search_query': search_query,
+    }
+    return render(request, 'politicians/politician_list.html', context)
 
 # View a specific politician's details and records.
 def politician_view(request, slug):
