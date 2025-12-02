@@ -1,5 +1,4 @@
 from django.db import models
-import numpy as np
 from django.utils.text import slugify
 
 # Create your models here.
@@ -13,6 +12,19 @@ def custom_slugify(first_name, middle_name, last_name):
         last_name.strip().replace(" ", "_").replace("-", "_"),
     ])
     return slugify(full_name)
+
+class Region(models.Model):
+    name = models.CharField(max_length = 100, unique = True)
+
+    def __str__(self):
+        return self.name
+
+class Province(models.Model):
+    name = models.CharField(max_length = 100, unique = True)
+    region = models.ForeignKey(Region, on_delete = models.CASCADE)
+
+    def __str__(self):
+        return self.name
 
 class Politician(models.Model):
     last_name = models.CharField(max_length = 100)
@@ -38,19 +50,6 @@ class Politician(models.Model):
             name_parts.append(self.middle_name)
         name_parts.append(self.last_name)
         return " ".join(name_parts)
-
-class Region(models.Model):
-    name = models.CharField(max_length = 100, unique = True)
-
-    def __str__(self):
-        return self.name
-
-class Province(models.Model):
-    name = models.CharField(max_length = 100, unique = True)
-    region = models.ForeignKey(Region, on_delete = models.CASCADE)
-
-    def __str__(self):
-        return self.name
 
 class PoliticianRecord(models.Model):
     politician = models.ForeignKey(Politician, on_delete = models.CASCADE)

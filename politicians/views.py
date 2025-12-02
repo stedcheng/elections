@@ -1,16 +1,15 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import custom_slugify, Politician, PoliticianRecord, Province
-from .forms import PoliticianForm, PoliticianRecordForm
-from django.http import HttpResponse
+from django.conf import settings
 from django.contrib import messages
 from django.db.models import Q
-import numpy as np
-from django.utils.text import slugify
-from .graph import *  
-import os
-from django.conf import settings
-import json
+from django.shortcuts import render, redirect, get_object_or_404
 from django.templatetags.static import static
+from django.utils.text import slugify
+from .forms import PoliticianForm, PoliticianRecordForm
+from .graph import *  
+from .models import custom_slugify, Politician, PoliticianRecord, Province
+import os
+import json
+
 
 # Create your views here.
 

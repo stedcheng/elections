@@ -6,7 +6,7 @@ import networkx as nx
 from pyvis.network import Network
 from django.db.models import Min
 
-from .models import *
+from .models import PoliticianRecord
 import io
 import base64
 

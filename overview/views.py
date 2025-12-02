@@ -1,6 +1,5 @@
 from django.shortcuts import render
 from politicians.models import Politician, PoliticianRecord, Province, Region
-from django.db.models import Count, Q
 
 def dashboard(request):
     """Main dashboard view with overview statistics and navigation"""

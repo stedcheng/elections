@@ -1,14 +1,10 @@
 from django.shortcuts import render
+from django.conf import settings
 import pandas as pd
 import json
-import plotly.express as px
 import plotly.graph_objects as go
 from plotly.utils import PlotlyJSONEncoder
-import os
-from django.conf import settings
-from django.shortcuts import render
-from politicians.models import Province, Politician, PoliticianRecord
-import json
+from politicians.models import Politician, PoliticianRecord, Province
 
 # Get the base context using the models we had
 def get_base_context(request):
