@@ -203,7 +203,6 @@ def get_top_family_name(province_name, year):
     # 4. Collect valid family names
     family_list = []
     family_to_politicians = {}  # map family -> list of politician names
-    print(largest_dynasty)
     for rec in largest_dynasty:
         fnames = family_names(rec.politician)
         for fam, _ in fnames:
@@ -228,8 +227,6 @@ def get_top_family_name(province_name, year):
         'Count': top_count,
         'Politicians': top_family_politicians
     }
-
-    print(dct)
     return dct, None
 
 def province_analysis(request):
