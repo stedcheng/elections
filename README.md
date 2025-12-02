@@ -1,4 +1,4 @@
-<h1>{{ Title }}</h1>
+<h1>PoliThinks</h1>
 
 <h2>Introduction</h2>
 
