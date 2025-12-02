@@ -1,3 +1,12 @@
 # Ignore python cache
 __pycache__/
-*.pyc"db.sqlite3" 
+*.pyc
+
+# Local files
+datasets/Final CCD.csv
+datasets/Final Gini.csv
+datasets/Final HHI.csv 
+datasets/FINALCSV.csv 
+datasets/PH_Adm2_ProvDists.csv 
+populate.py 
+temp.ipynb
