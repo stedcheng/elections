@@ -10,9 +10,6 @@ from .models import *
 import io
 import base64
 
-# degree_threshold = st.sidebar.slider("Select a connection threshold.", min_value = 0, max_value = 10, value = 1,
-#                                     help = "The network will only show 1) politicians with at least this number of connections, and 2) politicians belonging to the same dynasty as any of the politicians in 1).")
-
 def get_colors(degree_threshold, largest_community, G_filtered, above_threshold):
     if degree_threshold <= 1:
         node_color_map = {

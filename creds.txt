@@ -1,3 +1,0 @@
-username: admin
-email address: admin@elections.ph
-password: 1234

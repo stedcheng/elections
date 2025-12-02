@@ -13,10 +13,4 @@ urlpatterns = [
     path('politician/<slug:slug>/record/add/', views.politicianrecord_add, name = "politicianrecord_add"),
     path('politician/<slug:slug>/record/<int:record_id>/update/', views.politicianrecord_update, name = "politicianrecord_update"),
     path('politician/<slug:slug>/record/<int:record_id>/delete/', views.politicianrecord_delete, name = "politicianrecord_delete"),
-    # path('customers/', views.listcustomers, name = 'customer-list'),
-    # path('customer/new/', views.addcustomer, name = 'customer-add'),
-    # path('customer/<int:pk>/', views.detailcustomer, name = 'customer-detail'),
-    # path('customer/<int:pk>/update', views.updatecustomer, name = 'customer-update'),
-    # path('customer/<int:pk>/delete', views.deletecustomer, name = 'customer-delete'),
-    # path('customer/<int:customer_id>/address/new', views.addaddress, name = 'address-add'),
 ]
