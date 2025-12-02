@@ -37,9 +37,9 @@ def get_colors(degree_threshold, largest_community, G_filtered, above_threshold)
             for node in G_filtered.nodes()
         }
         legend_items = [
-            patches.Patch(color = "#d54a46", label = "Largest Dynasty"),
-            patches.Patch(color = "#ee734a", label = f"At Least {degree_threshold} Connections"),
-            patches.Patch(color = "#fba050", label = "Both"),
+            patches.Patch(color = "#ee734a", label = "Largest Dynasty"),
+            patches.Patch(color = "#fba050", label = f"At Least {degree_threshold} Connections"),
+            patches.Patch(color = "#d54a46", label = "Both"),
             patches.Patch(color = "#777777", label = "Neither")
         ]
     return node_color_map, legend_items
