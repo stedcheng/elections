@@ -84,9 +84,6 @@ class PoliticianRecord(models.Model):
         'MEMBER, HOUSE OF REPRESENTATIVES' : 5,
         'GOVERNOR' : 5
     }
-
-    class Meta:
-        ordering = ['year']
     
     def position_weight(self):
         return self.position_weight_dict.get(self.position, 0)
