@@ -41,27 +41,7 @@ def get_colors(degree_threshold, largest_community, G_filtered, above_threshold)
         ]
     return node_color_map, legend_items
 
-def generate_graph(province, year):
-    # Filter and sort data for the given province and year
-    # df_province_year = data[(data["Province"] == province) & (data["Year"] == year)].sort_values(by = ["Year"], ascending = False)
-
-    # Drop duplicates
-    # df_unique_names = df_province_year.drop_duplicates(subset = ["Full Name"], keep = "first").copy()
-    # df_unique_names = df_unique_names.fillna("")
-
-    # Pre-compute values for faster lookup
-    # name_data = df_unique_names.set_index("Full Name")[["Last Name", "Middle Name", "Position Weight", "Community", "Position"]].to_dict(orient = "index")
-
-    # Use NumPy for faster matrix operations
-    # names = df_unique_names["Full Name"].unique()
-    # num_names = len(names)
-    # am = np.zeros((num_names, num_names), dtype = int)
-
-    # Extract columns for vectorized operations
-    # ln = df_unique_names["Last Name"].values
-    # mn = df_unique_names["Middle Name"].values
-    # weights = df_unique_names["Position Weight"].values
-    
+def generate_adjacency_matrix(province, year): 
     first_ids = (
         PoliticianRecord.objects
         .filter(province__name = province, year = year)
@@ -69,7 +49,7 @@ def generate_graph(province, year):
         .annotate(first_id = Min("id"))
         .values_list("first_id", flat = True)
     )
-    unique_records = PoliticianRecord.objects.filter(id__in = first_ids) # equivalent of df_unique_names
+    unique_records = PoliticianRecord.objects.filter(id__in = first_ids)
 
     name_data = {
         record.politician.slug: {
@@ -88,8 +68,6 @@ def generate_graph(province, year):
     ln = [record.politician.last_name for record in unique_records]
     mn = [record.politician.middle_name for record in unique_records]
     weights = [record.position_weight() for record in unique_records]
-    
-    ##############################
 
     for i in range(num_names):
         for j in range(i + 1, num_names):
@@ -110,13 +88,9 @@ def generate_graph(province, year):
 
     # Create a graph with all politicians using the original adjacency matrix
     am_df = pd.DataFrame(am, index = names, columns = names)
-    # G_all = nx.from_pandas_adjacency(am_df)
-
-    # return am_df, df_unique_names, name_data
     return am_df, unique_records, name_data
 
-# def generate_filtered_graph(am_df, df_unique_names, name_data, degree_threshold):
-def generate_filtered_graph(am_df, unique_records, name_data, degree_threshold):
+def generate_graph(am_df, unique_records, name_data, degree_threshold):
     # Include only those politicians whose degree is higher than the degree threshold...
     nonzero_counts = pd.DataFrame((am_df > 0).sum(axis = 1))
     above_threshold = list(nonzero_counts[nonzero_counts[0] >= degree_threshold].index)
@@ -124,9 +98,6 @@ def generate_filtered_graph(am_df, unique_records, name_data, degree_threshold):
     # ...and the politicians who are connected to those higher than the degree threshold
     above_threshold_community = set()
     communities = []
-    # Streamlit: replace these two rows with the next four rows
-    # for comm in pd.Series(df_unique_names["Community"].unique()):
-    #     communities.append(list(df_unique_names[df_unique_names["Community"] == comm]["Full Name"]))
     unique_communities = unique_records.values_list("community", flat = True).distinct()
     for comm in unique_communities:
         slugs = unique_records.filter(community = comm).values_list("politician__slug", flat = True)

@@ -215,13 +215,12 @@ def get_base_context(request):
      
 def plot_graph(request):
     context = get_base_context(request)
-    
     province = context['selected_province']
     year = context['selected_year']
     degree_threshold = 2
 
-    am_df, unique_records, name_data = generate_graph(province, year)
-    G_filtered, above_threshold, above_threshold_community, communities = generate_filtered_graph(am_df, unique_records, name_data, degree_threshold)
+    am_df, unique_records, name_data = generate_adjacency_matrix(province, year)
+    G_filtered, above_threshold, above_threshold_community, communities = generate_graph(am_df, unique_records, name_data, degree_threshold)
     static_graph, pos = display_static_graph(province, year, degree_threshold, G_filtered, above_threshold, communities)
     interactive_html = get_interactive_html(degree_threshold, above_threshold, communities, G_filtered, pos)
     context.update({
