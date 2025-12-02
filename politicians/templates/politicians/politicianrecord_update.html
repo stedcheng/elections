@@ -65,8 +65,7 @@
     
     <!-- Action buttons -->
     <div style="margin-bottom: 30px;">
-        <button type="submit" class="btn" style="background-color: #007bff; color: white; border-color: #007bff; margin-right: 10px;">Update Record</button>
-        <a href="{% url 'politicians:politician_view' politician.slug %}" class="btn">Cancel</a>
+        <button type="submit" class="btn" style="background-color: #007bff; color: white; border-color: #007bff;">Update Record</button>
     </div>
 </form>
 
@@ -91,6 +90,9 @@
     border-radius: 4px;
     font-size: 14px;
     background-color: white;
+    height: 36px;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
 }
 
 .form-group input[type="text"]:focus, 

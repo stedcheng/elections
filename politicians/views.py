@@ -17,7 +17,6 @@ from django.templatetags.static import static
 # Landing page
 def index(request):
     politicians = Politician.objects.all()
-    total_count = politicians.count()
     
     # Get search query if provided
     search_query = request.GET.get('search', '')
@@ -30,7 +29,7 @@ def index(request):
     
     # Paginate results
     politicians = politicians.order_by('first_name', 'last_name')[:50]  # Limit to 50 for performance
-    
+    total_count = politicians.count()
     context = {
         'politicians': politicians,
         'total_count': total_count,
